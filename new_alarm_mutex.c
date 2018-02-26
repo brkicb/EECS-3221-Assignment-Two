@@ -1,5 +1,3 @@
-// TOAN TRUONG
-
 /*
  * new_alarm_mutex.c
  *
