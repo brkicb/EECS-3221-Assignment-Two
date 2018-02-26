@@ -208,9 +208,11 @@ int main (int argc, char *argv[])
         else if (!(sscanf (line, "Create_Thread: MessageType(%d)", &alarm->type) < 1))
         {
             printf("Entered Create_Thread Branch\n");
+            new_thread = pthread_create (&thread, NULL, alarm_thread, NULL);
             printf("New Alarm Thread %d For Message Type (%d) " 
                 "Created at %ld:%d\n", thread, alarm->type, alarm->time, alarm->type);
-            new_thread = pthread_create (&thread, NULL, alarm_thread, NULL);
+            printf("%d",new_thread)
+            
         }
         else if (!(sscanf (line, "Terminate_Thread: MessageType(%d)", &alarm->type) < 1))
         {
