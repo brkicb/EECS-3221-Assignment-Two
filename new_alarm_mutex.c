@@ -45,6 +45,8 @@ void *alarm_thread (void *arg)
     int sleep_time;
     time_t now;
     int status;
+    int alarmL[];
+    int i = 0;
 
     /*
      * Loop forever, processing commands. The alarm thread will
@@ -153,7 +155,11 @@ int main (int argc, char *argv[])
             printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
 
             printf("%s\n", alarm->message);
-            
+
+	    i=i+1;
+            alarmL[i] = alarm->type;
+	    insertSort(&alarmL, &i);
+
             status = pthread_mutex_lock (&alarm_mutex);
             if (status != 0)
                 err_abort (status, "Lock mutex");
@@ -218,5 +224,20 @@ int main (int argc, char *argv[])
             printf("All Alarm Threads for Message Type(%d) Terminated And All Messages "
                 "of\nMessage Type Removed at %ld:%d\n", alarm->type, alarm->time, alarm->type);
         }
+    }
+}
+
+void insertSort(int array[], int n) {
+
+  int i, j, temp
+    for(i = 1; i < n;i++) {
+      temp = array[i];
+      j = i - 1;
+      
+      while (j >= 0 && array[j] > temp) {
+	array[j+1] = array[j];
+	j = j - 1;
+      }
+      array[j+1] = temp;
     }
 }
