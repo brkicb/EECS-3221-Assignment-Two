@@ -44,13 +44,13 @@
 #include <time.h>
 #include "errors.h"
 
-<<<<<<< HEAD
+
 //#define DEBUG
 #define NUM_THREADS 10
 =======
 #define TRUE  1
 #define FALSE 0
->>>>>>> Qiao
+
 
 /*
  * The "alarm" structure now contains the time_t (time since the
@@ -173,7 +173,6 @@ void *alarm_thread (int *arg)//writter
 
 int main (int argc, char *argv[])//writter
 {
-<<<<<<< HEAD
     int status, worker_status[NUM_THREADS];
     alarm_t *alarm, **last, *next;
     pthread_t thread;
@@ -183,14 +182,12 @@ int main (int argc, char *argv[])//writter
     int i;
     int thread_i = 0;
 
-=======
     int status, new_thread;
     char line[128];
     alarm_t *alarm, **last, *next, *t_alarm;
     pthread_t thread;
     
     /*
->>>>>>> Qiao
     // make a separate thread that will run the alarm_thread function
     status = pthread_create (&thread, NULL, alarm_thread, NULL);
     // error in creation of the thread if status isn't 0
@@ -282,7 +279,6 @@ int main (int argc, char *argv[])//writter
         }
         else if (!(sscanf (line, "Create_Thread: MessageType(%d)", &alarm->type) < 1))
         {
-<<<<<<< HEAD
             int this_type = alarm->type;
             
             worker_status[thread_i] = pthread_create (&workers[thread_i], NULL, alarm_thread, NULL);
@@ -293,7 +289,6 @@ int main (int argc, char *argv[])//writter
             thread_i = ((thread_i + 1) % 10);
             printf("New Alarm Thread %d For Message Type (%d) " 
                 "Created at %ld:%d\n", workers[thread_i-1], alarm->type, alarm->time, alarm->type);
-=======
             printf("Entered Create_Thread Branch\n");
             new_thread = pthread_create (&thread, NULL, alarm_thread, &alarm->type);//pass alarm->type as parameter to the new thread
             
@@ -304,7 +299,6 @@ int main (int argc, char *argv[])//writter
         else if (!(sscanf (line, "Terminate_Thread: MessageType(%d)", &alarm->type) < 1))
         {
             printf("Entered Terminate_Thread Branch\n");
->>>>>>> Qiao
 
             status = pthread_mutex_lock (&rw_mutex);
             if (status != 0)
@@ -313,24 +307,21 @@ int main (int argc, char *argv[])//writter
             t_alarm = alarm_list;
             while(t_alarm != NULL)//go through the list
             {
-<<<<<<< HEAD
+
                 if (next->type == this_type)
                 {
                     worker_status[thread_i-1] = pthread_mutex_lock (&alarm_mutex);
                     if (worker_status[thread_i-1] != 0)
                         err_abort (worker_status[thread_i-1], "Lock mutex");
-=======
             
                 if(t_alarm->type == alarm->type)//check message tye
                 {
                     //switching termanation flag
                     t_alarm->terminate = TRUE;
->>>>>>> Qiao
                 }
                 t_alarm = t_alarm->link; 
             }
 
-<<<<<<< HEAD
             worker_status[thread_i-1] = pthread_mutex_unlock (&alarm_mutex);
             if (worker_status[thread_i-1] != 0)
                 err_abort (worker_status[thread_i-1], "Unlock mutex");
@@ -356,11 +347,10 @@ int main (int argc, char *argv[])//writter
                 last = &next->link;
                 next = next->link;
             }
-=======
+
             status = pthread_mutex_unlock (&rw_mutex);
             if (status != 0)
                 err_abort (status, "Unlock mutex");
->>>>>>> Qiao
 
             printf("All Alarm Threads for Message Type(%d) Terminated And All Messages of Message Type Removed at %ld:Type C\n", alarm->type, time(NULL));
         }
