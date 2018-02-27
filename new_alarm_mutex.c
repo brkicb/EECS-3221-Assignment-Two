@@ -124,6 +124,7 @@ int main (int argc, char *argv[])
     int type[NUM_THREADS];
     int type_i = 0;
     char line[128];
+    char request_type[10];
     int i;
     int thread_i = 0;
 
@@ -159,6 +160,7 @@ int main (int argc, char *argv[])
         } 
         else if (!(sscanf(line, "%d MessageType(%d) %128[^\n]", &alarm->seconds, &alarm->type, alarm->message) < 2))
         {
+            strncpy(request_type, "Type A", 10);
             status = pthread_mutex_lock (&alarm_mutex);
             if (status != 0)
                 err_abort (status, "Lock mutex");
@@ -168,11 +170,6 @@ int main (int argc, char *argv[])
              * Insert the new alarm into the list of alarms,
              * sorted by expiration time.
              */
-            // last holds value of address of alarm_list which holds another address
-            // &last = 0x8080 
-            // last = &alarm_list = 0x8092 
-            // *last = alarm_list = 0x8194 
-            // **last = *alarm_list = (alarm_t value)
             last = &alarm_list;
             // next holds value of the adress held in alarm_list
             // next = *last = alarm_list = 0x8194
@@ -184,7 +181,7 @@ int main (int argc, char *argv[])
                     alarm->link = next;
                     *last = alarm;
                     printf("\nAlarm Request With Message Type(%d) Inserted by Main Thread %d Into\n", alarm->type, thread);
-                    printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
+                    printf("Alarm List at %ld:%s\n\n", alarm->time, request_type);
                     break;
                 }
                 else if (next->time >= alarm->time) 
@@ -192,7 +189,7 @@ int main (int argc, char *argv[])
                     alarm->link = next;
                     *last = alarm;
                     printf("\nAlarm Request With Message Type(%d) Inserted by Main Thread %d Into\n", alarm->type, thread);
-                    printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
+                    printf("Alarm List at %ld:%s\n\n", alarm->time, request_type);
                     break;
                 }
                 last = &next->link;
@@ -209,7 +206,7 @@ int main (int argc, char *argv[])
                 *last = alarm;
                 alarm->link = NULL;
                 printf("\nAlarm Request With Message Type(%d) Inserted by Main Thread %d Into\n", alarm->type, thread);
-                printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
+                printf("Alarm List at %ld:%s\n\n", alarm->time, request_type);
             }
 			#ifdef DEBUG
                 printf ("[list: ");
@@ -224,7 +221,9 @@ int main (int argc, char *argv[])
         }
         else if (!(sscanf (line, "Create_Thread: MessageType(%d)", &alarm->type) < 1))
         {
+            strncpy(request_type, "Type B", 10);
             int this_type = alarm->type;
+            alarm->time = time (NULL);
             
             worker_status[thread_i] = pthread_create (&workers[thread_i], NULL, alarm_thread, NULL);
 
@@ -236,8 +235,8 @@ int main (int argc, char *argv[])
             type[type_i] = this_type;
             type_i = ((type_i + 1) % NUM_THREADS);
 
-            printf("New Alarm Thread %d For Message Type (%d) " 
-                "Created at %ld:%d\n", workers[thread_i-1], alarm->type, alarm->time, alarm->type);
+            printf("\nNew Alarm Thread %d For Message Type (%d) " 
+                "Created at %ld:%s\n\n", workers[thread_i-1], alarm->type, alarm->time, request_type);
 
 
             last = &alarm_list;
@@ -261,6 +260,7 @@ int main (int argc, char *argv[])
         }
         else if (!(sscanf (line, "Terminate_Thread: MessageType(%d)", &alarm->type) < 1))
         {
+            strncpy(request_type, "Type C", 10);
             int this_type = alarm->type;
             for (i=0; i<=NUM_THREADS; i++)
             {
@@ -285,7 +285,6 @@ int main (int argc, char *argv[])
             {
                 if (next->type == this_type)
                 {
-                    printf("made it in the if statement\n");
                     // start of list
                     if (next == prev)
                     {
@@ -308,7 +307,6 @@ int main (int argc, char *argv[])
                 }
                 else
                 {
-                    printf("made it in the else statement\n");
                     prev = next;
                     next = next->link;
                 }              
@@ -321,8 +319,9 @@ int main (int argc, char *argv[])
                 printf ("]\n");
             #endif
 
-            printf("All Alarm Threads for Message Type(%d) Terminated And All Messages "
-                "of\nMessage Type Removed at %ld:%d\n", this_type, alarm->time, alarm->type);
+            alarm->time = time (NULL);
+            printf("\nAll Alarm Threads for Message Type(%d) Terminated And All Messages "
+                "of\nMessage Type Removed at %ld:%s\n\n", this_type, alarm->time, request_type);
         }
     }
 }
