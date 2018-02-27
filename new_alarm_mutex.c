@@ -111,10 +111,11 @@ void *alarm_thread (void *arg)
 
 int main (int argc, char *argv[])
 {
-    int status, new_thread;
+    int status, second_status;
     char line[128];
     alarm_t *alarm, **last, *next;
     pthread_t thread;
+    pthread_t second_thread;
     
 
     // make a separate thread that will run the alarm_thread function
@@ -211,10 +212,26 @@ int main (int argc, char *argv[])
         }
         else if (!(sscanf (line, "Create_Thread: MessageType(%d)", &alarm->type) < 1))
         {
-            printf("Entered Create_Thread Branch\n");
-            printf("New Alarm Thread %d For Message Type (%d) " 
-                "Created at %ld:%d\n", thread, alarm->type, alarm->time, alarm->type);
-            new_thread = pthread_create (&thread, NULL, alarm_thread, NULL);
+            second_status = pthread_create (&second_thread, NULL, alarm_thread, NULL);
+
+            if (second_status != 0)
+                err_abort (second_status, "Create alarm thread");
+
+            while (1)
+            {
+                second_status = pthread_mutex_lock (&alarm_mutex);
+                if (second_status != 0)
+                    err_abort (second_status, "Lock mutex");
+
+
+                printf("Entered Create_Thread Branch\n");
+                printf("New Alarm Thread %d For Message Type (%d) " 
+                    "Created at %ld:%d\n", thread, alarm->type, alarm->time, alarm->type);
+
+                second_status = pthread_mutex_unlock(&alarm_mutex);
+                if (second_status != 0)
+                    err_abort (second_status, "Unlock mutex");
+            }
         }
         else if (!(sscanf (line, "Terminate_Thread: MessageType(%d)", &alarm->type) < 1))
         {
