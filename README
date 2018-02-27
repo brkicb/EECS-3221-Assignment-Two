@@ -1,33 +1,64 @@
-1. First copy the files "alarm_mutex.c", and "errors.h" into your
+1. First copy the files "alarm_mutex.c", "errors.h", and makefile into your
    own directory.
 
-2. To compile the program "alarm_mutex.c", use the following command:
+2. To compile the program "alarm_mutex.c", use the command:
 
-      cc new_alarm_mutex.c -D_POSIX_PTHREAD_SEMANTICS -lpthread
+      make
 
-3. Type "a.out" to run the executable code.
+3. Type "./a.out" to run the executable code.
 
-4. At the prompt "ALARM>", type in the number of seconds at which
-   the alarm should expire, followed by the text of the message.
-   For example:
+4. At the prompt "alarm>"
 
-   ALARM> 2 Good Morning!
+   You will have three alarm request types you can use: Type A, Type B, and Type C
+
+   To use Type A, type:
+   <time> MessageType(<type>) <message>
+
+   where:
+   <time> is the time it will take for the alarm to go off
+   <type> is an integer value that denotes the message type, it is
+   used for prioritizing messages in the list
+   <message> is the message you'd like to print
+
+   This command will store a Type A alarm request into the list, and its
+   position in the list is determined by what the <type> was specified as
+
+   To use Type B, type:
+   Create_Thread: MessageType(<type>)
+   where:
+   <type> is the same as described above
+
+   This will create a thread that will execute Type A alarm requests
+   in the list the are of the according type specified
+
+   These Type A alarm requests will execute periodically with a time
+   interval that was specified by <time> when specifying the Type A
+   alarm request
+
+   To use Type C, type:
+   Terminate_Thread: MessageType(<type>)
+   where:
+   <type> is the same as described above
+
+   This will terminate all threads that are currently executing
+   and will remove all Type A alarm requests in the list that are
+   of the type specified by <type> in the Type C alarm request
+
+5. Terminating the progam.
 
   (To exit from the program, type Ctrl-d.)
+  
+6. As the alarms are printing it could be hard to type in commands, 
+thus it is suggested to copy and paste commands from another file into the teminal.
+Here's some test commands:
+5 MessageType(1) baha1
 
-5.. Read pages 52-58 of the book "Programming with POSIX Threads"
-   by David R. Butenhof for a detailed explanation of how the
-   program "alarm_mutex.c" works.
-   (The book "Programming with POSIX Threads" has been put on
-   reserve in Steacie Library.)
+6 MessageType(2) baha2
 
+7 MessageType(1) baha3
 
-   5 MessageType(1) baha1
+Create_Thread: MessageType(1)
 
-   6 MessageType(2) baha2
+Create_Thread: MessageType(2)
 
-   7 MessageType(1) baha3
-
-   Create_Thread: MessageType(1)
-
-   Create_Thread: MessageType(2)
+Terminate_Thread: MessageType(1)
