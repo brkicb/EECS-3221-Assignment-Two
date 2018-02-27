@@ -15,6 +15,8 @@
 #include <time.h>
 #include "errors.h"
 
+#define DEBUG
+
 /*
  * The "alarm" structure now contains the time_t (time since the
  * Epoch, in seconds) for each alarm, so that they can be
@@ -43,8 +45,6 @@ void *alarm_thread (void *arg)
     int sleep_time;
     time_t now;
     int status;
-    int alarmL[];
-    int i = 0;
 
     /*
      * Loop forever, processing commands. The alarm thread will
@@ -52,6 +52,7 @@ void *alarm_thread (void *arg)
      */
     while (1) 
     {
+        // start critical section
         status = pthread_mutex_lock (&alarm_mutex);
         if (status != 0)
             err_abort (status, "Lock mutex");
@@ -89,6 +90,8 @@ void *alarm_thread (void *arg)
          * readied by user input, without delaying the message
          * if there's no input.
          */
+
+        // end critical section
         status = pthread_mutex_unlock (&alarm_mutex);
         if (status != 0)
             err_abort (status, "Unlock mutex");
@@ -116,6 +119,7 @@ int main (int argc, char *argv[])
     alarm_t *alarm, **last, *next;
     pthread_t thread;
     pthread_t second_thread;
+    
     
 
     // make a separate thread that will run the alarm_thread function
@@ -150,15 +154,6 @@ int main (int argc, char *argv[])
         } 
         else if (!(sscanf(line, "%d MessageType(%d) %128[^\n]", &alarm->seconds, &alarm->type, alarm->message) < 2))
         {
-            printf("\nAlarm Request With Message Type(%d) Inserted by Main Thread %d Into\n", alarm->type, thread);
-            printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
-
-            printf("%s\n", alarm->message);
-
-	    i=i+1;
-            alarmL[i] = alarm->type;
-	    insertSort(&alarmL, &i);
-
             status = pthread_mutex_lock (&alarm_mutex);
             if (status != 0)
                 err_abort (status, "Lock mutex");
@@ -179,10 +174,20 @@ int main (int argc, char *argv[])
             next = *last;
             while (next != NULL) 
             {
-                if (next->time >= alarm->time) 
+                if (alarm->type < next->type)
                 {
                     alarm->link = next;
                     *last = alarm;
+                    printf("\nAlarm Request With Message Type(%d) Inserted by Main Thread %d Into\n", alarm->type, thread);
+                    printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
+                    break;
+                }
+                else if (next->time >= alarm->time) 
+                {
+                    alarm->link = next;
+                    *last = alarm;
+                    printf("\nAlarm Request With Message Type(%d) Inserted by Main Thread %d Into\n", alarm->type, thread);
+                    printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
                     break;
                 }
                 last = &next->link;
@@ -198,6 +203,8 @@ int main (int argc, char *argv[])
             {
                 *last = alarm;
                 alarm->link = NULL;
+                printf("\nAlarm Request With Message Type(%d) Inserted by Main Thread %d Into\n", alarm->type, thread);
+                printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
             }
 			#ifdef DEBUG
             	printf ("[list: ");
@@ -219,19 +226,11 @@ int main (int argc, char *argv[])
 
             while (1)
             {
-                second_status = pthread_mutex_lock (&alarm_mutex);
-                if (second_status != 0)
-                    err_abort (second_status, "Lock mutex");
-
-
-                printf("Entered Create_Thread Branch\n");
+                        
+            }
+            printf("Entered Create_Thread Branch\n");
                 printf("New Alarm Thread %d For Message Type (%d) " 
                     "Created at %ld:%d\n", thread, alarm->type, alarm->time, alarm->type);
-
-                second_status = pthread_mutex_unlock(&alarm_mutex);
-                if (second_status != 0)
-                    err_abort (second_status, "Unlock mutex");
-            }
         }
         else if (!(sscanf (line, "Terminate_Thread: MessageType(%d)", &alarm->type) < 1))
         {
@@ -239,20 +238,5 @@ int main (int argc, char *argv[])
             printf("All Alarm Threads for Message Type(%d) Terminated And All Messages "
                 "of\nMessage Type Removed at %ld:%d\n", alarm->type, alarm->time, alarm->type);
         }
-    }
-}
-
-void insertSort(int array[], int n) {
-
-  int i, j, temp
-    for(i = 1; i < n;i++) {
-      temp = array[i];
-      j = i - 1;
-      
-      while (j >= 0 && array[j] > temp) {
-	array[j+1] = array[j];
-	j = j - 1;
-      }
-      array[j+1] = temp;
     }
 }
