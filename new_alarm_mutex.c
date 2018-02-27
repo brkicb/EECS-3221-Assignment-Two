@@ -231,10 +231,10 @@ int main (int argc, char *argv[])
             if (worker_status[thread_i] != 0)
                 err_abort (worker_status[thread_i], "Create alarm thread");
 
-            thread_i = ((thread_i + 1) % 10);
+            thread_i = ((thread_i + 1) % NUM_THREADS);
 
             type[type_i] = this_type;
-            type_i = ((type_i + 1) % 10);
+            type_i = ((type_i + 1) % NUM_THREADS);
 
             printf("New Alarm Thread %d For Message Type (%d) " 
                 "Created at %ld:%d\n", workers[thread_i-1], alarm->type, alarm->time, alarm->type);
@@ -322,7 +322,7 @@ int main (int argc, char *argv[])
             #endif
 
             printf("All Alarm Threads for Message Type(%d) Terminated And All Messages "
-                "of\nMessage Type Removed at %ld:%d\n", alarm->type, alarm->time, alarm->type);
+                "of\nMessage Type Removed at %ld:%d\n", this_type, alarm->time, alarm->type);
         }
     }
 }
