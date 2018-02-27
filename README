@@ -1,33 +1,21 @@
-1. First copy the files "alarm_mutex.c", and "errors.h" into your
+1. First copy the files "new_alarm_mutex.c", and "errors.h", and makefile into your
    own directory.
 
-2. To compile the program "alarm_mutex.c", use the following command:
+2. To compile the program "new_alarm_mutex.c", use the following command:
+
+      make
+      
+3. This will execute the following:
 
       cc new_alarm_mutex.c -D_POSIX_PTHREAD_SEMANTICS -lpthread
 
-3. Type "a.out" to run the executable code.
+4. Type "a.out" to run the executable code.
 
-4. At the prompt "ALARM>", type in the number of seconds at which
-   the alarm should expire, followed by the text of the message.
-   For example:
+5. At the prompt "alarm>", 
 
-   ALARM> 2 Good Morning!
+   You can now input 3 types of alarm requests
+   
+   
 
   (To exit from the program, type Ctrl-d.)
 
-5.. Read pages 52-58 of the book "Programming with POSIX Threads"
-   by David R. Butenhof for a detailed explanation of how the
-   program "alarm_mutex.c" works.
-   (The book "Programming with POSIX Threads" has been put on
-   reserve in Steacie Library.)
-
-
-   5 MessageType(1) baha1
-
-   6 MessageType(2) baha2
-
-   7 MessageType(1) baha3
-
-   Create_Thread: MessageType(1)
-
-   Create_Thread: MessageType(2)
