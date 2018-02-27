@@ -16,6 +16,7 @@
 #include "errors.h"
 
 //#define DEBUG
+#define NUM_THREADS 10
 
 /*
  * The "alarm" structure now contains the time_t (time since the
@@ -114,13 +115,14 @@ void *alarm_thread (void *arg)
 
 int main (int argc, char *argv[])
 {
-    int status, second_status;
-    char line[128];
+    int status, worker_status[NUM_THREADS];
     alarm_t *alarm, **last, *next;
     pthread_t thread;
-    pthread_t second_thread;
-    int type;
-    
+    pthread_t workers[NUM_THREADS];
+    pthread_attr_t attr[NUM_THREADS];
+    char line[128];
+    int i;
+    int thread_i = 0;
 
     // make a separate thread that will run the alarm_thread function
     status = pthread_create (&thread, NULL, alarm_thread, NULL);
@@ -218,41 +220,59 @@ int main (int argc, char *argv[])
             if (status != 0)
                 err_abort (status, "Unlock mutex");
         }
-        else if (!(sscanf (line, "Create_Thread: MessageType(%d)", &type) < 1))
+        else if (!(sscanf (line, "Create_Thread: MessageType(%d)", &alarm->type) < 1))
         {
-            int this_type = type;
-            second_status = pthread_create (&second_thread, NULL, alarm_thread, NULL);
+            int this_type = alarm->type;
+            
+            worker_status[thread_i] = pthread_create (&workers[thread_i], NULL, alarm_thread, NULL);
 
-            if (second_status != 0)
-                err_abort (second_status, "Create alarm thread");
+            if (worker_status[thread_i] != 0)
+                err_abort (worker_status[thread_i], "Create alarm thread");
 
-
+            thread_i = ((thread_i + 1) % 10);
             printf("New Alarm Thread %d For Message Type (%d) " 
-                "Created at %ld:%d\n", thread, alarm->type, alarm->time, alarm->type);
+                "Created at %ld:%d\n", workers[thread_i-1], alarm->type, alarm->time, alarm->type);
 
 
             last = &alarm_list;
             next = *last;
             while (next != NULL)
             {
-                if (alarm->type == this_type)
+                if (next->type == this_type)
                 {
-                    second_status = pthread_mutex_lock (&alarm_mutex);
-                    if (second_status != 0)
-                        err_abort (second_status, "Lock mutex");
+                    worker_status[thread_i-1] = pthread_mutex_lock (&alarm_mutex);
+                    if (worker_status[thread_i-1] != 0)
+                        err_abort (worker_status[thread_i-1], "Lock mutex");
                 }
                 last = &next->link;
                 next = next->link;
             }
 
-            second_status = pthread_mutex_unlock (&alarm_mutex);
-            if (second_status != 0)
-                err_abort (second_status, "Unlock mutex");
+            worker_status[thread_i-1] = pthread_mutex_unlock (&alarm_mutex);
+            if (worker_status[thread_i-1] != 0)
+                err_abort (worker_status[thread_i-1], "Unlock mutex");
 
         }
         else if (!(sscanf (line, "Terminate_Thread: MessageType(%d)", &alarm->type) < 1))
         {
-            
+            for (i=0; i<=NUM_THREADS; i++)
+            {
+                pthread_cancel(workers[i]);
+            }
+
+            last = &alarm_list;
+            next = *last;
+            while (next != NULL) 
+            {
+                // need way to remove node with specified type
+                if (next->type == alarm->type)
+                {
+                    //last->link = last->link->link;
+                    //next->link = next->link->link;
+                }
+                last = &next->link;
+                next = next->link;
+            }
 
             printf("All Alarm Threads for Message Type(%d) Terminated And All Messages "
                 "of\nMessage Type Removed at %ld:%d\n", alarm->type, alarm->time, alarm->type);
