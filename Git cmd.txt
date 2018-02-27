@@ -1,0 +1,8 @@
+git checkout <branch_name>
+git add <file_name>
+git commit -m "your message
+
+also change to the above commands:
+git checkout -b <branch_name>
+git push -u origin <branch_name>
+// This creates new remote branch
