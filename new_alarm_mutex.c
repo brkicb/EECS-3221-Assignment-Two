@@ -15,7 +15,8 @@
 #include <time.h>
 #include "errors.h"
 
-//#define DEBUG
+#define DEBUG
+
 #define NUM_THREADS 10
 
 /*
@@ -116,10 +117,12 @@ void *alarm_thread (void *arg)
 int main (int argc, char *argv[])
 {
     int status, worker_status[NUM_THREADS];
-    alarm_t *alarm, **last, *next;
+    alarm_t *alarm, **last, *next, *prev;
     pthread_t thread;
     pthread_t workers[NUM_THREADS];
     pthread_attr_t attr[NUM_THREADS];
+    int type[NUM_THREADS];
+    int type_i = 0;
     char line[128];
     int i;
     int thread_i = 0;
@@ -208,13 +211,12 @@ int main (int argc, char *argv[])
                 printf("\nAlarm Request With Message Type(%d) Inserted by Main Thread %d Into\n", alarm->type, thread);
                 printf("Alarm List at %ld:%d\n\n", alarm->time, alarm->type);
             }
-			      #ifdef DEBUG
+			#ifdef DEBUG
                 printf ("[list: ");
-            	  for (next = alarm_list; next != NULL; next = next->link)
-                    printf ("%d(%d)[\"%s\"] ", next->time,
-                        next->time - time (NULL), next->message);
-            	  printf ("]\n");
-			      #endif
+                for (next = alarm_list; next != NULL; next = next->link)
+                    printf ("%d(%d)[\"%s\"] ", next->time, next->time - time (NULL), next->message);
+            	printf ("]\n");
+			#endif
 
             status = pthread_mutex_unlock (&alarm_mutex);
             if (status != 0)
@@ -230,6 +232,10 @@ int main (int argc, char *argv[])
                 err_abort (worker_status[thread_i], "Create alarm thread");
 
             thread_i = ((thread_i + 1) % 10);
+
+            type[type_i] = this_type;
+            type_i = ((type_i + 1) % 10);
+
             printf("New Alarm Thread %d For Message Type (%d) " 
                 "Created at %ld:%d\n", workers[thread_i-1], alarm->type, alarm->time, alarm->type);
 
@@ -255,24 +261,65 @@ int main (int argc, char *argv[])
         }
         else if (!(sscanf (line, "Terminate_Thread: MessageType(%d)", &alarm->type) < 1))
         {
+            int this_type = alarm->type;
             for (i=0; i<=NUM_THREADS; i++)
             {
-                pthread_cancel(workers[i]);
+                if ((type[i] == alarm->type) && (type[i] != NULL))
+                {
+                    type[i] = -1;
+                    pthread_cancel(workers[i]);
+                }
+                
             }
 
-            last = &alarm_list;
-            next = *last;
-            while (next != NULL) 
+            #ifdef DEBUG
+                printf ("[list: (At start of loop)");
+                for (next = alarm_list; next != NULL; next = next->link)
+                    printf ("%d(%d)[\"%s\"] ", next->time, next->time - time (NULL), next->message);
+                printf ("]\n");
+            #endif
+
+            next = alarm_list;
+            prev = alarm_list;
+            while (next != NULL)
             {
-                // need way to remove node with specified type
-                if (next->type == alarm->type)
+                if (next->type == this_type)
                 {
-                    //last->link = last->link->link;
-                    //next->link = next->link->link;
+                    printf("made it in the if statement\n");
+                    // start of list
+                    if (next == prev)
+                    {
+                        alarm_t *temp;
+                        temp = next;
+                        next = next->link;
+                        temp->link = NULL;
+                        prev = next;
+                        alarm_list = next;
+                    }
+                    // middle or end of list
+                    else
+                    {
+                        alarm_t *temp;
+                        temp = next->link;
+                        prev->link = next->link;
+                        next->link = NULL;
+                        next = temp;
+                    }
                 }
-                last = &next->link;
-                next = next->link;
+                else
+                {
+                    printf("made it in the else statement\n");
+                    prev = next;
+                    next = next->link;
+                }              
             }
+
+            #ifdef DEBUG
+                printf ("[list: (At end of loop)");
+                for (next = alarm_list; next != NULL; next = next->link)
+                    printf ("%d(%d)[\"%s\"] ", next->time, next->time - time (NULL), next->message);
+                printf ("]\n");
+            #endif
 
             printf("All Alarm Threads for Message Type(%d) Terminated And All Messages "
                 "of\nMessage Type Removed at %ld:%d\n", alarm->type, alarm->time, alarm->type);
