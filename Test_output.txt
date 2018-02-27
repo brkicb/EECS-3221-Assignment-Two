@@ -3,44 +3,54 @@
 10 MessageType(3) Good
 5 MessageType(2) Friend
 Create_Thread: MessageType(2)
+Create_Thread: MessageType(3)
 Terminate_Thread: MessageType(2)
 
 //terminal output
 
- ./new_alarm_mutex 
+./new_alarm_mutex 
 alarm> 10 MessageType(2) Hello
 
-Alarm Request With Message Type(2) Inserted by Main Thread 1578211072 Into
-Alarm List at 1519763872:2
+Alarm Request With Message Type(2) Inserted by Main Thread 242444032 Into
+Alarm List at 1519771650:2
 
 alarm> 10 MessageType(3) Good
 
-Alarm Request With Message Type(3) Inserted by Main Thread 1578211072 Into
-Alarm List at 1519763880:3
+Alarm Request With Message Type(3) Inserted by Main Thread 242444032 Into
+Alarm List at 1519771660:3
 
 alarm> 5 MessageType(2) Friend
 
-Alarm Request With Message Type(2) Inserted by Main Thread 1578211072 Into
-Alarm List at 1519763893:2
+Alarm Request With Message Type(2) Inserted by Main Thread 242444032 Into
+Alarm List at 1519771670:2
 
 alarm> Create_Thread: MessageType(2)
 Entered Create_Thread Branch
-New Alarm Thread 1569875712 For Message Type (2) Created at 1519763903:Type B
-alarm> Alarm Request With Message Type (2) Assigned to Alarm Thread 1569875712 at 1519763903: Friend
-Alarm Request With Message Type (2) Assigned to Alarm Thread 1569875712 at 1519763903: Hello
-Alarm With Message Type (2) Printed by Alarm Thread 1553090304 at 1519763903 : Type A Hello
-Alarm With Message Type (2) Printed by Alarm Thread 1561483008 at 1519763903 : Type A Friend
-Alarm With Message Type (2) Printed by Alarm Thread 1561483008 at 1519763908 : Type A Friend
-Alarm With Message Type (2) Printed by Alarm Thread 1553090304 at 1519763913 : Type A Hello
-Alarm With Message Type (2) Printed by Alarm Thread 1561483008 at 1519763913 : Type A Friend
-Alarm With Message Type (2) Printed by Alarm Thread 1561483008 at 1519763918 : Type A Friend
-Alarm With Message Type (2) Printed by Alarm Thread 1553090304 at 1519763923 : Type A Hello
-Alarm With Message Type (2) Printed by Alarm Thread 1561483008 at 1519763923 : Type A Friend
-Alarm With Message Type (2) Printed by Alarm Thread 1561483008 at 1519763928 : Type A Friend
-Alarm With Message Type (2) Printed by Alarm Thread 1553090304 at 1519763933 : Type A Hello
-Alarm With Message Type (2) Printed by Alarm Thread 1561483008 at 1519763933 : Type A Friend
+New Alarm Thread 234108672 For Message Type (2) Created at 1519771715:Type B
+alarm> Alarm Request With Message Type (2) Assigned to Alarm Thread 234108672 at 1519771715: Friend
+Alarm Request With Message Type (2) Assigned to Alarm Thread 234108672 at 1519771715: Hello
+Alarm With Message Type (2) Printed by Alarm Thread 217323264 at 1519771715 : Type A Hello
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771715 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771720 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 217323264 at 1519771725 : Type A Hello
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771725 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771730 : Type A Friend
+Create_Thread: MessageType(2)Alarm With Message Type (2) Printed by Alarm Thread 217323264 at 1519771735 : Type A Hello
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771735 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771740 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 217323264 at 1519771745 : Type A Hello
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771745 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771750 : Type A Friend
+Create_Thread: MessageType(3)
+Entered Create_Thread Branch
+New Alarm Thread 134215424 For Message Type (2) Created at 1519771751:Type B
+alarm> Alarm With Message Type (2) Printed by Alarm Thread 217323264 at 1519771755 : Type A Hello
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771755 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771760 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 217323264 at 1519771765 : Type A Hello
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771765 : Type A Friend
+Alarm With Message Type (2) Printed by Alarm Thread 225715968 at 1519771771 : Type A Friend
 Terminate_Thread: MessageType(2)
 Entered Terminate_Thread Branch
-All Alarm Threads for Message Type(2) Terminated And All Messages of Message Type Removed at 1519763935:Type C
-alarm> ^C
+All Alarm Threads for Message Type(2) Terminated And All Messages of Message Type Removed at 1519771772:Type C
 
