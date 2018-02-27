@@ -30,7 +30,8 @@ typedef struct alarm_tag
 {
     struct alarm_tag    *link;
     int                 seconds;
-    int                 type;
+    int                 type;   // the message type
+    int                 status; // 0 for unassigned, 1 for assigned
     time_t              time;   /* seconds from EPOCH */
     char                message[128];
 } alarm_t;
@@ -43,7 +44,7 @@ alarm_t *alarm_list = NULL;
  */
 void *alarm_thread (void *arg)
 {
-    alarm_t *alarm;
+    alarm_t *alarm, *prev, *next;
     int sleep_time;
     time_t now;
     int status;
@@ -59,6 +60,20 @@ void *alarm_thread (void *arg)
         if (status != 0)
             err_abort (status, "Lock mutex");
         alarm = alarm_list;
+
+        next = alarm_list;
+        prev = alarm_list;
+        while (next != NULL)
+        {
+            if (next->status == 0)
+            {
+                next->status = 1;
+                printf("\nAlarm Request With Message Type (%d) Assigned to Alarm Thread %u at\n", next->type, (unsigned int)(pthread_self()));
+                printf("%d:Type A\n\n", next->time);
+            }
+            prev = next;
+            next = next->link;             
+        }
 
         /*
          * If the alarm list is empty, wait for one second. This
@@ -161,6 +176,7 @@ int main (int argc, char *argv[])
         else if (!(sscanf(line, "%d MessageType(%d) %128[^\n]", &alarm->seconds, &alarm->type, alarm->message) < 2))
         {
             strncpy(request_type, "Type A", 10);
+            alarm->status = 0;
             status = pthread_mutex_lock (&alarm_mutex);
             if (status != 0)
                 err_abort (status, "Lock mutex");
