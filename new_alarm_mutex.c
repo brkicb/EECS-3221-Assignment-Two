@@ -1,5 +1,11 @@
 /*
- * new_rw_mutex.c
+ * Kuangphau Qiao, 213172598
+ * Bryan Brkic, 213958806 
+ * Toan Truong, 213943246
+ * Alvis Koshy, 213624739
+ *
+ *
+ * new_alarm_mutex.c
  *
  * This is an enhancement to the alarm_thread.c program, which
  * created an "alarm thread" for each alarm command. This new
