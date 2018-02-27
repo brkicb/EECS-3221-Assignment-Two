@@ -3,7 +3,7 @@
 
 2. To compile the program "alarm_mutex.c", use the following command:
 
-      cc -o new_alarm_mutex new_alarm_mutex.c -D_POSIX_PTHREAD_SEMANTICS -lpthread
+      cc new_alarm_mutex.c -D_POSIX_PTHREAD_SEMANTICS -lpthread
 
 3. Type "a.out" to run the executable code.
 
@@ -20,3 +20,14 @@
    program "alarm_mutex.c" works.
    (The book "Programming with POSIX Threads" has been put on
    reserve in Steacie Library.)
+
+
+   5 MessageType(1) baha1
+
+   6 MessageType(2) baha2
+
+   7 MessageType(1) baha3
+
+   Create_Thread: MessageType(1)
+
+   Create_Thread: MessageType(2)
